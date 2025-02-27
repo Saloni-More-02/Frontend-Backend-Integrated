@@ -1,23 +1,49 @@
-// using Microsoft.AspNetCore.Components.Web;
-// using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-// using BlazorFrontEnd;
+// var builder = WebApplication.CreateBuilder(args);
+// var app = builder.Build();
 
-// var builder = WebAssemblyHostBuilder.CreateDefault(args);
-// builder.RootComponents.Add<App>("#app");
-// builder.RootComponents.Add<HeadOutlet>("head::after");
+// app.MapGet("/", () => "Hello World!");
 
-// builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+// app.Run();
 
-// await builder.Build().RunAsync();
+var builder = WebApplication.CreateBuilder(args);
 
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using BlazorFrontEnd;
+// Register CORS services
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
+var app = builder.Build();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5132") });
+// Configure CORS middleware
+app.UseCors();
 
-await builder.Build().RunAsync();
+app.MapGet("/api/productlist", () =>
+{
+    return new[]
+    {
+        new
+        {
+            Id = 1,
+            Name = "Laptop",
+            Price = 1200.50,
+            Stock = 25,
+            Category = new { Id = 101, Name = "Electronics" }
+        },
+        new
+        {
+            Id = 2,
+            Name = "Headphones",
+            Price = 50.00,
+            Stock = 100,
+            Category = new { Id = 102, Name = "Accessories" }
+        }
+    };
+});
+
+app.Run();
